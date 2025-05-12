@@ -4,19 +4,7 @@
 $(document).ready(function() {
 	$('#popup-close-btn').click(closePopup); // 팝업 닫기 버튼 이벤트 연결
     initPopupOverlay(); // 팝업 추가 창 초기화
-    setViewportHeight();
 });
-
-$(window).on('resize orientationchange', function () {
-  	setViewportHeight();
-});
-
-function setViewportHeight() {
-	var vh = window.innerHeight;
-	$('#app').css('height', vh + 'px');
-}
-
-
 
 // 팝업 추가 창 초기화
 function initPopupOverlay(){

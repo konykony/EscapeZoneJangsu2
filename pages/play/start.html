@@ -38,12 +38,24 @@
         }
 
         .bottom-buttons {
-            height: 100px;
+            /* height: 100px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); */
+            
+            position: fixed;       /* 화면 하단에 고정 */
+            bottom: 0;             /* 하단에 위치 */
+            left: 0;
+            width: 100%;
             background-color: #ffffff;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            z-index: 10;           /* 다른 요소 위에 표시되도록 */
         }
 
         .bottom-buttons .btn {
