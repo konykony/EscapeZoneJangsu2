@@ -232,3 +232,9 @@ div.progress {
 	color: black;
 	text-decoration: none;
 }
+
+img {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }

@@ -33,7 +33,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     border-radius: 4px;
-    margin: 5px 0;
+    margin: 5px 0 1px;
   }
 
   .slot button {
@@ -43,7 +43,7 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1;
   }
 
@@ -82,11 +82,12 @@
     .slot .letter {
       width: 40px;
       height: 40px;
-      font-size: 1.3rem;
+      line-height: 40px;
+      font-size: 1.5rem;
     }
 
     .slot button {
       width: 40px;
-      font-size: 1.3rem;
+      font-size: 2rem;
     }
   }

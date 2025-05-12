@@ -3,6 +3,7 @@
  */
 $(document).ready(function() {
 	initPopupOverlay(); // 팝업 추가 창 초기화
+    $('img').attr('draggable', 'false');
 });
 
 // 팝업 추가 창 초기화

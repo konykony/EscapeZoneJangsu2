@@ -443,7 +443,7 @@ function checkPage8() {
 
 function playAudio(fileName) {
 	var play_audio = new Audio('../../sound/' + fileName); // 재생할 오디오 파일 경로를 지정합니다.
-
+	play_audio.currentTime = 0; // 재생 위치를 처음(0초)으로 이동 = 완전 정지
 	// 2. 재생 시작
 	play_audio.play().then(() => {
 		// 재생이 성공적으로 시작되었을 때 실행할 코드 (선택 사항)
