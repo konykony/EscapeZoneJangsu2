@@ -537,19 +537,19 @@ function showRandomImageAndRedirect() {
 	// 		$('#exciting-audio source')[0].attr('src', randomAudioSrc);
 	//         $('#exciting-audio')[0].play();
 
-	playSoundEffect(randomAudioSrc);
-	// var audio = new Audio(randomAudioSrc); // 재생할 오디오 파일 경로를 지정합니다.
-
-	// // 2. 재생 시작
-	// audio.play().then(() => {
-	// 	// 재생이 성공적으로 시작되었을 때 실행할 코드 (선택 사항)
-	// 	console.log('오디오 재생 시작!');
-	// })
-	// 	.catch((error) => {
-	// 		// 재생이 실패했을 때 실행할 코드 (주로 자동 재생 정책 위반)
-	// 		console.error('오디오 재생 실패:', error);
-	// 		// 사용자에게 재생 버튼을 표시하거나, 오류 메시지를 보여줄 수 있습니다.
-	// 	});
+	// playSoundEffect(randomAudioSrc);
+	var audio = new Audio(randomAudioSrc); // 재생할 오디오 파일 경로를 지정합니다.
+	audio.currentTime = 0; // 재생 위치를 처음(0초)으로 이동 = 완전 정지
+	// 2. 재생 시작
+	audio.play().then(() => {
+		// 재생이 성공적으로 시작되었을 때 실행할 코드 (선택 사항)
+		console.log('오디오 재생 시작!');
+	})
+		.catch((error) => {
+			// 재생이 실패했을 때 실행할 코드 (주로 자동 재생 정책 위반)
+			console.error('오디오 재생 실패:', error);
+			// 사용자에게 재생 버튼을 표시하거나, 오류 메시지를 보여줄 수 있습니다.
+		});
 
 	setTimeout(function () {
 		if(isAdmin()){
