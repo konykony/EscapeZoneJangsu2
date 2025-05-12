@@ -1,7 +1,6 @@
 html,
 body {
     overflow: hidden;
-    height: 100%;
     margin: 0;
     padding: 0;
     /* background-color: #f4f6f9; */
@@ -14,6 +13,7 @@ body {
     height: 100vh;
     padding: 0;
     overflow: hidden;
+    height: 100vh;
 }
 
 #header {
