@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관리자 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            flex-direction: column;
+            font-size: 1.5rem;
+        }
+
+        #passwordBox {
+            border: 2px solid #ced4da;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: white;
+            text-align: center;
+            width: 300px;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        #gameList {
+            display: none;
+            margin-top: 20px;
+            max-width: 300px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #gameList .btn {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="passwordBox">
+        <h4>관리자 인증</h4>
+        <input type="password" id="passwordInput" class="form-control mt-3" placeholder="비밀번호를 입력하세요" />
+        <button id="checkBtn" class="btn btn-primary mt-3 w-100">확인</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <div id="gameList" class="container">
+        <h5 class="mb-3">게임 목록</h5>
+        <div class="d-grid gap-2">
+            <!-- 버튼이 JavaScript로 생성됨 -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../lib/js-cookie-3.0.1-dist/js.cookie.min.js"></script>
+    <script>
+        let PASS_WORD = "konny";
+        $(document).ready(function () {
+            
+		    initCookieClear();
+            // 페이지 로드시 쿠키 확인
+            
+            if (localStorage.getItem("authenticated") === 'true') {
+                showGameList();
+            }
+
+            // 비밀번호 확인 버튼 클릭 시
+            $('#checkBtn').click(function () {
+                const password = $('#passwordInput').val();
+                const message = $('#message');
+
+                if (password === PASS_WORD) {
+                    message.text('비밀번호가 맞습니다!').css('color', 'green').fadeIn();
+                    // setCookie('authenticated', 'true', 1); // 쿠키에 인증 상태 저장
+                    localStorage.setItem("authenticated", "true");
+                    showGameList();
+                } else {
+                    message.text('비밀번호가 틀렸습니다.').css('color', 'red').fadeIn();
+                    $('#passwordInput').val('');
+                }
+            });
+
+            // 게임 버튼 생성
+            function showGameList() {
+                $('#passwordBox').hide();
+                $('#gameList').fadeIn();
+
+                for (let i = 1; i <= 11; i++) {
+                    const btn = $('<a>')
+                        .addClass('btn btn-outline-secondary')
+                        .text(`${i}번 게임`)
+                        .attr('href', `../play/game${i}.html?mode=test&user=admin`);
+                    $('#gameList .d-grid').append(btn);
+                }
+            }
+
+            // // 쿠키 설정 함수
+            // function setCookie(name, value, days) {
+            //     const expires = new Date();
+            //     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            //     document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
+            // }
+
+            // // 쿠키 가져오기 함수
+            // function getCookie(name) {
+            //     const nameEQ = name + "=";
+            //     const ca = document.cookie.split(';');
+            //     for (let i = 0; i < ca.length; i++) {
+            //         let c = ca[i];
+            //         while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            //         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            //     }
+            //     return null;
+            // }
+        });
+
+        function initCookieClear(){
+            // 현재 도메인 정보
+            const domain = window.location.hostname;
+            
+            const cookies = Cookies.get(); // 모든 쿠키를 key-value 객체 형태로 가져옵니다.
+
+            for (const cookieName in cookies) {
+                if (cookies.hasOwnProperty(cookieName)) {
+                    Cookies.remove(cookieName, { domain: domain }); // 각 쿠키를 이름(key)을 사용하여 삭제합니다.
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>

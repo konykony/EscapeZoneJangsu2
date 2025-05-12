@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5번 문제</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link href="../../css/common.css" rel="stylesheet" />
+    <style>
+        .lock-container {
+
+            width: 210px;
+            height: 299px;
+            background-image: url(../..//img/lock/lock_05_on.png);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 150px;
+        }
+
+        .digit-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .arrow-button {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: white;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .arrow-button>i {
+            font-size: 1.5em;
+        }
+
+        .digit-display {
+            background-color: white;
+            color: #333;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 0px 5px;
+            border-radius: 5px;
+            width: 30px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .message {
+            color: white;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div id="header"></div>
+        <!-- 퍼즐 영역 -->
+        <div id="puzzle-text"></div>
+        <div class="puzzle-area">
+            <img id="puzzleImg" class="w-100">
+        </div>
+    </div>
+    <!-- 힌트 모달 창 -->
+    <div id="hintModal"></div>
+    <!-- lock 모달 창-->
+    <div id="lockModal">
+        <div class="d-flex align-items-center mb-3">
+            <span class="back-arrow me-2" id="closeLockBtn">&lt;</span>
+            <h3 class="mb-0">자물쇠 풀기</h3>
+        </div>
+        <div class="divider"></div>
+        <div class="lock-container mx-auto mt-3">
+            <div class="digit-row">
+                <div class="arrow-button" onclick="changeDigit(0, -1)"><i class="bi bi-caret-left-fill"></i></div>
+                <div id="digit-0" class="digit-display">0</div>
+                <div class="arrow-button" onclick="changeDigit(0, 1)"><i class="bi bi-caret-right-fill"></i></div>
+            </div>
+            <div class="digit-row">
+                <div class="arrow-button" onclick="changeDigit(1, -1)"><i class="bi bi-caret-left-fill"></i></div>
+                <div id="digit-1" class="digit-display">0</div>
+                <div class="arrow-button" onclick="changeDigit(1, 1)"><i class="bi bi-caret-right-fill"></i></div>
+            </div>
+            <div class="digit-row">
+                <div class="arrow-button" onclick="changeDigit(2, -1)"><i class="bi bi-caret-left-fill"></i></div>
+                <div id="digit-2" class="digit-display">0</div>
+                <div class="arrow-button" onclick="changeDigit(2, 1)"><i class="bi bi-caret-right-fill"></i></div>
+            </div>
+            <!-- 				<div id="message" class="message"></div> -->
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <div id="footer"></div>
+    <div id="exciting"></div>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+    <script src="../../js/common.js"></script>
+    <script src="../../js/cookieManage.js"></script>
+    <script src="../../js/0515.js"></script>
+    <script src="../../js/jsonManage.js"></script>
+    <script src="../../js/playComm.js"></script>
+    <script>
+        var isAnswerCorrect = false; // 정답 맞추면 true
+		const digits = [ 0, 0, 0 ];
+		const digitElements = [ document.getElementById('digit-0'),
+				document.getElementById('digit-1'),
+				document.getElementById('digit-2') ];
+		const messageElement = document.getElementById('message');
+		const correctAnswer = '123'; // 정답을 문자열 형태로 저장
+
+		function updateDisplay2() {
+			for (let i = 0; i < 3; i++) {
+				digitElements[i].textContent = String(digits[i]).padStart(1,
+						'0');
+			}
+		}
+
+		function changeDigit(index, direction) {
+			digits[index] += direction;
+			if (digits[index] < 0) {
+				digits[index] = 9;
+			} else if (digits[index] > 9) {
+				digits[index] = 0;
+			}
+			updateDisplay2();
+			checkAnswer();
+		}
+
+		// 정답 확인
+		function checkAnswer() {
+			if(isAnswerCorrect){
+				return;
+			}
+			playButtonClickSound(); // 자물쇠 버튼 클릭하면 소리 재생
+ 			const currentAnswer = digits.map(String).join(''); // 현재 선택된 숫자를 문자열로 합침
+			if (checkTestMode()) { // 테스트 모드인 경우
+                
+	 			if (currentAnswer === correctAnswer) {
+	 				setSuccess();
+	 			}
+			}else{
+				if(checkSolution(currentAnswer)){
+					setSuccess();
+					setTimeout(() => {
+// 						goExcitingPage();
+						showExciting();
+					}, 1000);
+				}
+			}
+		}
+		
+		// 성공 했을 때 실행
+		function setSuccess(){
+            changeLockImg($(".lock-container"), "05");
+			$("#result").removeClass("alert-danger").addClass("alert-success").text("정답입니다!").slideDown();
+			isAnswerCorrect = true;
+			playUnlockSound(); // 잠금 풀림 소리 재생
+		}
+		
+        $(document).ready(function() {
+        	
+        	if (!checkTestMode()) { // 테스트 모드가 아닌 경우
+        		answer = getSolution();
+                $('#test-messege').hide();
+                $('#beforeButton').hide();
+            }else{
+                const beforeButton = $("<button class='btn btn-secondary ms-2 mt-3'>이전</button>");
+                const buttonContainer = $(
+                    "<div class='text-center mt-3'></div>")
+                    .append(beforeButton); // 감싸는 div 생성 및 text-center 클래스 적용
+                beforeButton.on("click", function () {
+                    location.href = 'lockTest.html';
+                });
+                $("#lockModal h3").text('123을 입력하세요');
+                $("#lockModal").append(buttonContainer);
+                $("#lockModal").append('<div id="result"></div>');
+                $('#test-messege').show();
+                $('#puzzle-contents').hide();
+        	}
+
+    		// 초기 표시
+    		updateDisplay2();
+            $("#beforeButton").on("click", function() {
+            	location.href = 'lockTest.html';
+            });
+
+            // $('#closeLockBtn').on('click', function () {
+            //     $("#lockModal").hide();
+            // });
+			// setChangeLockImg();
+        });
+		
+		// function setChangeLockImg(){
+		// 	var currentStage = getGameStage();
+		// 	if(currentStage % 2 === 0){
+		// 		$(".lock-container").css("background-image", "url('../../img/lock/lock_05_on.png')").fadeIn(100);
+		// 	}else{
+		// 		$(".lock-container").css("background-image", "url('../../img/lock/lock_07_on.png')").fadeIn(100);
+		// 	}
+		// }
+    </script>
+</body>
+
+</html>

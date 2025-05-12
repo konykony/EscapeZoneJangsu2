@@ -1,0 +1,41 @@
+.lock-vertical {
+    display: inline-block;
+}
+
+.lock-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.slot {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.slot button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    line-height: 1;
+}
+
+.slot .letter {
+    width: 48px;
+    height: 48px;
+    background: white;
+    color: #4B154B;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 48px;
+    margin: 0 10px;
+    border-radius: 4px;
+}
+
+.status {
+    margin-top: 1rem;
+    font-weight: bold;
+}

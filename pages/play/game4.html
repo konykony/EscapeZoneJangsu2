@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4번 문제</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link href="../../css/common.css" rel="stylesheet" />
+    <style>
+
+        .puzzle-area {
+            font-size: 1rem;
+        }
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            margin: 0 auto;
+            border: 2px solid #8d99ae;
+            background: #edf2f4;
+            overflow: hidden;
+        }
+
+        .item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            font-weight: bold;
+            color: #2b2d42;
+            text-align: center;
+        }
+
+        .bath-item {
+            background: #b5ddc9;
+        }
+
+        .other-item {
+            background: #d3c3dd;
+        }
+
+        #basket {
+            position: absolute;
+            bottom: 10px;
+            left: calc(50% - 75px);
+            width: 150px;
+            height: 80px;
+            z-index: 10;
+            user-select: none;
+        }
+
+        #basket .top {
+            width: 150px;
+            height: 50px;
+            background: #ffb703;
+        }
+
+        #basket .bottom {
+            width: 150px;
+            height: 30px;
+            background: #ffb703;
+            margin: -5px auto 0;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            line-height: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2b2d42;
+            text-align: center;
+        }
+
+        #score,
+        #difficulty {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            text-align: center;
+        }
+
+        .overlay .btn {
+            width: 140px;
+            font-size: 1rem;
+        }
+
+        .overlay .msg {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #dc3545;
+        }
+
+        #status-bar span {
+            font-size: 1em;
+        }
+
+        @media(max-width:600px) {
+            .item {
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+            }
+
+            #basket {
+                width: 80px;
+                height: 70px;
+                left: calc(50% - 40px);
+            }
+
+            #basket .top {
+                height: 45px;
+                width: 80px;
+            }
+
+            #basket .bottom {
+                width: 80px;
+                height: 25px;
+                margin-top: -5px;
+                line-height: 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div id="header"></div>
+        <!-- 퍼즐 영역 -->
+        <div id="puzzle-text"></div>
+        <div class="puzzle-area">
+            <div id="status-bar">
+                점수: <span id="score">0</span> / 난이도: <span id="difficulty">1</span>
+            </div>
+
+            <div id="game-area"></div>
+        </div>
+    </div>
+    <!-- 힌트 모달 창 -->
+    <div id="hintModal"></div>
+    <!-- lock 모달 창-->
+    <!-- <div id="lockModal"></div> -->
+
+    <!-- 푸터 -->
+    <div id="footer"></div>
+    <div id="exciting"></div>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+    <script src="../../js/common.js"></script>
+    <script src="../../js/cookieManage.js"></script>
+    <script src="../../js/0515.js"></script>
+    <script src="../../js/jsonManage.js"></script>
+    <script src="../../js/playComm.js"></script>
+    <script>
+
+
+        const maxLevel = 10;
+        // finalScore = 50;
+        let finalScore = 500;
+        let lastItemName = '';
+        let bathStreak = 0;
+
+        $(function () {
+            if (checkTestMode()) {
+                finalScore = 50;
+            }
+            const $area = $('#game-area');
+            let score = 0,
+                level = 1,
+                interval = 2000,
+                timers = {},
+                gameOver = true;
+
+            const bathNames = ['비누', '수건', '대야', '치약', '샴푸'],
+                otherNames = ['가위', '책', '연필', '화분', '안경'];
+
+            // 바구니 생성 & 드래그
+            const $basket = $(`
+            <div id="basket">
+                <div class="top"></div>
+                <div class="bottom">바구니</div>
+            </div>
+            `).appendTo($area)
+                .draggable({ axis: 'x', containment: 'parent' });
+
+            // 중앙에 “시작” 버튼
+            function showStart() {
+                $area.find('.overlay').remove();
+                const $ov = $(`
+                <div class="overlay">
+                <button id="start-btn" class="btn btn-primary">▶️ 시작</button>
+                </div>`);
+                $area.append($ov);
+                $ov.on('click', '#start-btn', startGame);
+            }
+
+            // 중앙에 “재도전” 버튼 + 메시지
+            function showRestart(msg) {
+                $area.find('.overlay').remove();
+                const $ov = $(`
+                <div class="overlay">
+                <div class="msg">${msg}</div>
+                <button id="restart-btn" class="btn btn-warning">🔄 재도전</button>
+                </div>`);
+                $area.append($ov);
+                $ov.on('click', '#restart-btn', startGame);
+            }
+
+            // 중앙에 다음 버튼 + 메시지
+            function showNext(msg) {
+                $area.find('.overlay').remove();
+                const $ov = $(`
+                <div class="overlay">
+                <div class="msg">${msg}</div>
+                <button id="next-btn" class="btn btn-primary">▶️ 다음</button>
+                </div>`);
+                $area.append($ov);
+                $ov.on('click', '#next-btn', function () {
+                    setTimeout(() => {
+                        showExciting();
+                    }, 1000)
+                });
+            }
+
+            // 아이템 생성
+            // function spawnItem() {
+            //   if (gameOver) return;
+            //   const isBath = Math.random() < 0.6,
+            //     list = isBath ? bathNames : otherNames,
+            //     txt = list[Math.floor(Math.random() * list.length)],
+            //     cls = isBath ? 'bath-item' : 'other-item';
+
+            //   const $it = $('<div class="item">').addClass(cls).text(txt)
+            //     .css('left', Math.random() * ($area.width() - 50));
+            //   $area.append($it);
+
+            //   $it.animate(
+            //     { top: $area.height() + 60 },
+            //     3000 - level * 200,
+            //     'linear',
+            //     () => handleCollision($it, false)
+            //   );
+            // }
+            function spawnItem() {
+                if (gameOver) return;
+
+                // 3연속 목욕용품 방지
+                const forceOther = bathStreak >= 2;
+                const isBath = forceOther ? false : Math.random() < 0.6;
+                const list = isBath ? bathNames : otherNames;
+
+                // 같은 이름이 연속으로 나오지 않도록
+                let txt;
+                do {
+                    txt = list[Math.floor(Math.random() * list.length)];
+                } while (txt === lastItemName);
+
+                lastItemName = txt;
+                bathStreak = isBath ? bathStreak + 1 : 0;
+
+                const cls = isBath ? 'bath-item' : 'other-item';
+                const $it = $('<div class="item">').addClass(cls).text(txt)
+                    .css('left', Math.random() * ($area.width() - 50));
+                $area.append($it);
+
+                $it.animate(
+                    { top: $area.height() + 60 },
+                    3000 - level * 200,
+                    'linear',
+                    () => handleCollision($it, false)
+                );
+            }
+
+            // 충돌 검사
+            function handleCollision($it, byCatch) {
+                if (gameOver) return;
+                const ip = $it.position(),
+                    bp = $basket.position(),
+                    bw = $basket.width(),
+                    bh = $basket.find('.top').height(),
+                    itemBotY = ip.top + $it.height(),
+                    itemCtrX = ip.left + $it.width() / 2,
+                    topY = bp.top,
+                    leftX = bp.left,
+                    rightX = bp.left + bw;
+
+                const caught = byCatch
+                    && itemBotY >= topY && itemBotY <= topY + bh
+                    && itemCtrX >= leftX && itemCtrX <= rightX;
+
+                const missed = !byCatch && ip.top >= $area.height();
+
+                if (caught) {
+                    $it.remove();
+                    if ($it.hasClass('bath-item')) {
+                        score += 10;
+                        catchSuccessAudio();
+                        // $('#score').text(`점수: ${score}`);
+                        $('#score').text(`${score}`);
+                        if (score >= finalScore) endGame('🎉 목표 달성!');
+                    } else {
+                        catchFailAudio();
+                        endGame('❌ 기타용품 받음!');
+                    }
+                }
+                else if (missed) {
+                    $it.remove();
+                    if ($it.hasClass('bath-item')) {
+                        catchFailAudio();
+                        endGame('❌ 목욕용품 놓침!');
+                    }
+                }
+            }
+
+            // 받기 성공시 오디오 재생
+            function catchSuccessAudio() {
+                playAudio('jump09.mp3');
+            }
+
+            // 받기 실패시 오디오 재생
+            function catchFailAudio() {
+                playAudio('fail.mp3');
+            }
+
+            // 상시 충돌 체크
+            function startCollisionCheck() {
+                clearInterval(timers.collision);
+                timers.collision = setInterval(() => {
+                    $area.find('.item').each((i, el) => handleCollision($(el), true));
+                }, 50);
+            }
+
+            // 난이도 상승
+            function increaseDifficulty() {
+                if (level < maxLevel) {
+                    level++;
+                    // $('#difficulty').text(`난이도: ${level}`);
+                    $('#difficulty').text(`${level}`);
+                    clearInterval(timers.spawn);
+                    interval = Math.max(400, interval - 300);
+                    timers.spawn = setInterval(spawnItem, interval);
+                }
+            }
+
+            // 게임 시작/재시작
+            function startGame() {
+                gameOver = false;
+                score = 0;
+                level = 1;
+                interval = 2000;
+                // $('#score').text('점수: 0');
+                $('#score').text('0');
+                // $('#difficulty').text('난이도: 1');
+                $('#difficulty').text('1');
+                $area.find('.item,.overlay').remove();
+
+                clearInterval(timers.spawn);
+                clearInterval(timers.diff);
+                clearInterval(timers.collision);
+
+                timers.spawn = setInterval(spawnItem, interval);
+                timers.diff = setInterval(increaseDifficulty, 10000);
+                startCollisionCheck();
+
+                playAudio('coin05.mp3');
+            }
+
+            // 게임 종료
+            function endGame(msg) {
+                gameOver = true;
+                clearInterval(timers.spawn);
+                clearInterval(timers.diff);
+                clearInterval(timers.collision);
+                if (score == finalScore) {
+                    playAudio('success.mp3');
+                    showNext(msg + `<br/> 최종점수: ${score}`);
+
+                } else {
+                    showRestart(msg + `<br/> 최종점수: ${score}`);
+                }
+            }
+
+            // 최초 “시작” 버튼
+            showStart();
+            // $('#footer .locker').hide();
+        });
+    </script>
+</body>
+
+</html>

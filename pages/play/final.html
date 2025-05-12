@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>통과</title>
+	<link rel="stylesheet" href="../../lib/bootstrap-5.0.2-dist/css/bootstrap.min.css" />
+	<style>
+		body {
+            background-color: #f8f9fa;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        .play-time {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .total-time-label {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        .description {
+            color: #343a40;
+            font-size: 0.9rem;
+  white-space: pre-wrap;
+  text-align: left;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+	<div class="container">
+        <h2 class="mb-3" id="title">내 기록</h2>
+        <div class="play-time"></div>
+<!--         <div class="total-time-label"> -->
+<!--             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-fill" viewBox="0 0 16 16"> -->
+<!--                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l4 2.356a.5.5 0 0 0 .496-.868L8 8.5V3.5z"/> -->
+<!--             </svg> -->
+<!--             총 시간 -->
+<!--         </div> -->
+        <div class="description">
+탈의실에 숨어 있던 장수탕 직원들이 고깔모자를 쓰고 케이크를 들고 나타나
+“생일 축하합니다” 노래를 불러주었습니다.
+
+사실 이 모든 건, 선녀님을 위한 깜짝 생일 파티였죠.
+직원들은 선녀님 몰래 케이크에 초를 켜고, 전등을 끈 뒤 등장할 계획이었지만
+그만 실수로 전등을 먼저 꺼버리는 바람에
+모두가 허둥지둥 우당탕탕—예정에 없던 소동이 벌어졌습니다.
+
+예상과는 조금 달랐지만,
+그날 장수탕에는 웃음과 따뜻함이 가득한 행복한 생일잔치가 열렸습니다.
+
+        </div>
+    </div>
+
+	<script src="../../lib/jquery/dist/jquery.min.js"></script>
+	<script src="../../lib/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+	<script src="../../js/cookieManage.js"></script>
+	<script src="../../js/jsonManage.js"></script>
+	<script src="../../js/common.js"></script>
+	<script src="../../js/jsonData/0515.js"></script>
+	<script type="text/javascript">
+	  	$(document).ready(function() {
+	  	    const currentTime = getEndTime() - getStartTime();
+	  	    $(".play-time").text(timeToString(currentTime));
+  	  		if(getEndTimeCookie() == null){
+  	  			goErrorPage();
+  	  		}
+  			// $('#title').text(getUserName() + '님의 기록');
+	  	});
+
+        // play-time 클릭 이벤트 추가
+        $(".play-time").on("click", function () {
+            $('body').css({
+                // 'transform': 'rotate(90deg)',
+            });
+            $(".description").hide(); // 설명 숨기기
+            $("#title").css({
+                "font-size": "3rem",
+            });
+            $("#title").removeClass("mb-3");
+            // $(".container").css({
+            //     'transform': 'rotate(90deg)',
+            //     // "transform-origin":" top left",
+            //     "width": "90%",
+            //     "max-width": "600px", // 최대 가로폭 제한
+            //     "height": "100vh",
+            //     "display": "flex",
+            //     "justify-content": "center",
+            //     "align-items": "center",
+            //     "flex-direction": "column",
+            //     "padding": "0", // 내부 여백 제거
+            //     "box-shadow":"none",
+            //     "background-color" : "#f8f9fa"
+            // });
+            // $(".play-time").css({
+            //     "font-size": "10rem",
+            //     "transition": "font-size 0.5s ease",
+            // });
+
+                // body와 html에 스크롤 제거
+            $("body, html").css({
+                overflow: "hidden",
+                margin: 0,
+                padding: 0
+            });
+
+            $(".container").css({
+                width: "100vh",     // 회전되기 때문에 세로를 가로로
+                height: "100vw",    // 회전되기 때문에 가로를 세로로
+                transform: "rotate(90deg)",
+                transformOrigin: "center",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%) rotate(90deg)", // 중앙 정렬 + 회전
+                padding: 0,
+                boxSizing: "border-box",
+                "box-shadow":"none",
+                "background-color" : "#f8f9fa"
+            });
+
+            $(".play-time").css({
+                fontSize: "10rem", // 화면 너비 기준으로 글자 크기 설정
+                transition: "font-size 0.5s ease",
+                "padding-top": "3rem"
+            });
+
+            $("#title").css({
+                position: "absolute",
+                top: "2rem",
+            })
+            // $("#title").hide(); // 제목도 함께 숨기고 싶으면 이 줄 유지
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>장수탕 선녀님 프롤로그</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .prologue-card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .prologue-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 20px;
+        }
+
+        .prologue-content {
+            font-size: 1.3rem;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        .prologue-button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .prologue-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- 프롤로그 카드 -->
+        <div class="prologue-card">
+            <div class="prologue-title">
+                프롤로그
+            </div>
+            <div class="prologue-content text-start">
+                장수탕은 동네에서 제일 오래된 목욕탕!<br/>
+
+                그리고 아무도 모르게, 여기엔 사람의 마음까지 씻어주는 '진짜 선녀님'이 일하고 있었죠.<br/>
+
+                사람들은 개운~하게 돌아가는데, 선녀님은 하루 종일 혼자 바쁘기만 해요.<br/>
+
+                그런데 오늘은 유난히 할 일이 많네요… 직원들은 다 어디 간 거야!?
+            </div>
+            <button class="prologue-button" id="btn-start">시작</button>
+        </div>
+    </div>
+
+    <!-- jQuery & Bootstrap JS -->
+	<script src="../../lib/jquery/dist/jquery.min.js"></script>
+	<script src="../../lib/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+	<script src="../../js/cookieManage.js"></script>
+	<script src="../../js/jsonManage.js"></script>
+	<script src="../../js/common.js"></script>
+	<script src="../../js/0515.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $('#btn-start').click(function () {
+                clickBtnStart();
+            });
+            var currentStage = getGameStage();
+            if (isNaN(currentStage) || currentStage > 0) {
+                goErrorPage();
+            }
+        });
+
+        function clickBtnStart() {
+            var currentStage = getGameStage();
+            if (!isNaN(currentStage) && currentStage == 0) {
+                goNextPage();
+            } else {
+                goErrorPage();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2번 문제</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link href="../../css/common.css" rel="stylesheet" />
+    <link href="../../css/alphabet5Unlock.css" rel="stylesheet" />
+    <style>
+        body {
+            /* background-color: #f0f8ff; */
+            /* text-align: center;
+            font-family: 'Arial', sans-serif; */
+        }
+
+        .tool-btn {
+            margin: 5px;
+        }
+
+        .tool-btn.active {
+            border: 2px solid #93bef7;
+        }
+
+        .mirror-container {
+            position: relative;
+            width: 90vw;
+            height: 60vh;
+            max-width: 500px;
+            margin: 10px auto;
+            background-color: #aee1f9;
+            border: 5px solid #aaa;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #lock-container {
+            width: 90vw;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .overlay-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #555;
+            margin-top: 0;
+        }
+
+        #steam-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #035fd6;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+        }
+
+        .cursor-tool {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 90;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        #lock-container button {
+            cursor: pointer;
+            /* 기본 포인터(손가락)로 유지 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div id="header"></div>
+        <!-- 퍼즐 영역 -->
+        <div id="puzzle-text"></div>
+        <div class="puzzle-area">
+            <div class="overlay-text">🪞 거울을 닦아 주세요</div>
+
+            <!-- 도구 선택 -->
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-primary tool-btn active" data-size="10" data-img="🖐">🖐 손바닥</button>
+                <button class="btn btn-outline-primary tool-btn" data-size="25" data-img="🛁">🛁 타올</button>
+                <button class="btn btn-outline-primary tool-btn" data-size="50" data-img="🧼">🧼 수건</button>
+            </div>
+
+            <!-- 거울 영역 -->
+            <div class="mirror-container">
+                <canvas id="fog" width="500" height="60vh"></canvas>
+                <div id="steam-message">🎉 STEAM!</div>
+            </div>
+
+            <!-- 브러시 아이콘 -->
+            <div id="cursor" class="cursor-tool">🖐</div>
+        </div>
+    </div>
+    <!-- 힌트 모달 창 -->
+    <div id="hintModal"></div>
+    <!-- lock 모달 창-->
+    <div id="lockModal"></div>
+
+    <!-- 푸터 -->
+    <div id="footer"></div>
+    <div id="exciting"></div>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+
+    <script src="../../js/common.js"></script>
+    <script src="../../js/cookieManage.js"></script>
+    <script src="../../js/0515.js"></script>
+    <script src="../../js/jsonManage.js"></script>
+    <script src="../../js/playComm.js"></script>
+    <script src="../../js/lock/alphabet5Unlock.js"></script>
+    <script>
+
+        const canvas = document.getElementById("fog");
+        // const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        const steamMsg = document.getElementById("steam-message");
+        const cursor = $("#cursor");
+        let mirror = $(".mirror-container");
+        var audio = new Audio('../../sound/glass_wipe_sound.wav'); // 재생할 오디오 파일 경로를 지정합니다.
+        audio.loop = true;
+
+        // 사이즈 조정
+        canvas.width = mirror.width();
+        canvas.height = mirror.height();
+
+        // 김서림 초기화
+        ctx.fillStyle = "#cccccc";  // 연회색
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        let drawing = false;
+        let brushSize = 10;
+
+        function updateBrushSize(size) {
+            brushSize = parseInt(size);
+        }
+
+        $(".tool-btn").click(function () {
+            $(".tool-btn").removeClass("active");
+            $(this).addClass("active");
+            updateBrushSize($(this).data("size"));
+            cursor.text($(this).data("img"));
+        });
+
+        function getPos(e) {
+            let rect = canvas.getBoundingClientRect();
+            let x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            let y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            return { x, y };
+        }
+
+        function draw(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, brushSize, 0, Math.PI * 2);
+            ctx.fillStyle = "#aee1f9";  // 하늘색 (닦인 후)
+            ctx.fill();
+        }
+
+        function checkCleared() {
+            let pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let cleared = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+                if (pixels[i] === 174 && pixels[i + 1] === 225 && pixels[i + 2] === 249) {
+                    cleared++;
+                }
+            }
+            let total = canvas.width * canvas.height;
+            if (cleared / total > 0.9) {
+                steamMsg.style.display = "block";
+            }
+        }
+
+        function handleStart(e) {
+            drawing = true;
+            handleMove(e);
+            // playGlassSound();
+            $("#puzzle-text").hide();
+            playSoundEffect('glass_wipe_sound.wav');
+        }
+
+        function handleMove(e) {
+            if (!drawing) return;
+            e.preventDefault();
+            let pos = getPos(e);
+            draw(pos.x, pos.y);
+            checkCleared();
+            cursor.css({ top: e.clientY || e.touches[0].clientY, left: e.clientX || e.touches[0].clientX });
+        }
+
+        function handleEnd() {
+            drawing = false;
+            // stopGlassSound();
+            stopSoundEffect();
+        }
+
+
+        // 물 트는 소리 on
+        // function playGlassSound() {
+        //     // 2. 재생 시작
+        //     audio.currentTime = 0;
+        //     audio.play().then(() => {
+        //         // 재생이 성공적으로 시작되었을 때 실행할 코드 (선택 사항)
+        //         console.log('오디오 재생 시작!');
+        //     }).catch((error) => {
+        //         // 재생이 실패했을 때 실행할 코드 (주로 자동 재생 정책 위반)
+        //         console.error('오디오 재생 실패:', error);
+        //         // 사용자에게 재생 버튼을 표시하거나, 오류 메시지를 보여줄 수 있습니다.
+        //     });
+        // }
+        // // 물 트는 소리 off
+        // function stopGlassSound() {
+        //     audio.pause();        // 재생을 일시정지
+        //     audio.currentTime = 0; // 재생 위치를 처음(0초)으로 이동 = 완전 정지
+        // }
+
+        function setSuccess() {
+            setTimeout(() => {
+                showExciting();
+            }, 1000);
+        }
+
+        canvas.addEventListener("mousedown", handleStart, { passive: false })
+        canvas.addEventListener("mousemove", handleMove);
+        canvas.addEventListener("mouseup", handleEnd);
+        canvas.addEventListener("mouseleave", handleEnd);
+
+        canvas.addEventListener("touchstart", handleStart, { passive: false })
+        canvas.addEventListener("touchmove", handleMove);
+        canvas.addEventListener("touchend", handleEnd);
+
+        // // 마우스 따라다니는 커서
+        // $(document).on("mousemove touchmove", function (e) {
+        //     let x = e.clientX || (e.touches && e.touches[0].clientX);
+        //     let y = e.clientY || (e.touches && e.touches[0].clientY);
+        //     cursor.css({ top: y, left: x }).show();
+        // });
+
+        // 마우스/터치가 거울 위에 있을 때만 도구 커서 표시
+        $(".mirror-container").on("mousemove touchmove", function (e) {
+            let x = e.clientX || (e.touches && e.touches[0].clientX);
+            let y = e.clientY || (e.touches && e.touches[0].clientY);
+            cursor.css({ top: y, left: x }).show();
+        });
+
+        // 거울에서 벗어나면 숨김
+        $(".mirror-container").on("mouseleave touchend", function () {
+            cursor.hide();
+        });
+
+        $(document).on("touchend mouseleave", function () {
+            cursor.hide();
+        });
+
+        $(document).ready(function () {
+            createArrowLockGame("steam", "#lockModal");
+            // $('.mirror-container').on("click", function (e) {
+            //     $("#puzzle-text").hide();
+            // });
+        });
+
+    </script>
+</body>
+</html>

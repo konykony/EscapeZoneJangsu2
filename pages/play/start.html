@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>장수탕 선녀님 시작화면</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../css/common.css" rel="stylesheet" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background-color: lightblue;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .main-area {
+            flex-grow: 1;
+            /* background-color: #0f5f7c; */
+            margin: 20px;
+            /* border: 1px solid #000; */
+            border-radius: 4px;
+            
+            display: flex;
+            align-items: center;  /* 세로 중앙 정렬 */
+            justify-content: center; /* 가로 중앙 정렬 (선택사항) */
+            height: 100%; /* 또는 부모 높이에 맞게 */
+        }
+
+        .bottom-buttons {
+            height: 100px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-buttons .btn {
+            width: 130px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="popup-overlay">
+        <div id="popup-content">
+            <span id="popup-close-btn" class="close-button">&times;</span>
+            <h4 id="popup-title"></h4>
+            <hr/>
+            <div id="popup-inner-content"></div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- 주요 콘텐츠 영역 -->
+        <div class="main-area">
+            <img src="../../img/0515/startPoster.jpg" class="img-fluid rounded">
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="bottom-buttons">
+            <!-- <button class="btn btn-primary">시작하기</button>
+            <button class="btn btn-primary">사용법 설명</button> -->
+            
+            <button class="btn btn-primary btn-lg btn-block btn-start">시작</button>
+            <button class="btn btn-secondary btn-lg btn-block btn-reset">초기화</button>
+            <button class="btn btn-secondary btn-lg btn-block btn-lock-test">사용법 설명</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+
+    <script src="../../js/common.js"></script>
+    <script src="../../js/cookieManage.js"></script>
+	<script src="../../js/jsonManage.js"></script>
+    <script src="../../js/0515.js"></script>
+
+    <script>
+
+        $(document).ready(function() {
+	   		$('.btn-start').click(function() {
+	   			onClickStart();
+	   		});
+	   		$('.btn-reset').click(function() {
+	   			onClickReset();
+	   		});
+	   		$('.btn-lock-test').click(function() {
+	   			onClickLockTest();
+	   		});
+
+			if (!checkCookieExists()) { // 쿠키 존재 안 하는 경우
+				$('.btn-reset').hide();
+				$('.btn-lock-test').show();
+				// setGameName('HanselAndGretel');
+			}else{
+				$('.btn-reset').show();
+				$('.btn-lock-test').hide();
+			}
+    	});
+
+	   	// 게임 시작 클릭
+		function onClickStart() {
+			if (!checkCookieExists()) { // 쿠키 존재 안 하는 경우
+                setGameStage(0); // 쿠키에 0 stage 저장
+                initHintUsed();// hint사용여부 초기 json을 cookie에 저장하기
+			}
+            goCurrentPage(); // 현재 페이지로 이동
+		}
+	   	
+	   	// 게임 초기화
+		function onClickReset() {
+			// 팝업 내용 동적 생성 및 추가
+	   		const contentWrapper = $('<div>').attr('id', 'content-wrapper'); // 추가된 wrapper div
+
+	   		const content = $("<p>관리자 비밀번호를 입력하세요</p>");
+            const inputContainer = $('<div>').attr('id', 'input-container').attr('class', 'input-group w-100 m-0');
+	   	    const nameInput = $('<input>').attr({
+	   	        type: 'password',
+	   	        id: 'pass-input',
+	   	        class: 'form-control',
+	   	        placeholder: '비밀번호를 입력하세요'
+	   	    });
+	   		
+	   	    // 저장 버튼 클릭시
+	   	 	function executeEvent() {
+	            const adminPass = $('#pass-input').val();
+	            if (adminPass == PASS_WORD) {
+	            	initCookieClear(adminPass);
+	            	alert('초기화 되었습니다.');
+					$('.btn-reset').hide();
+					$('.btn-lock-test').show();
+	            	closePopup();
+	            } else if(adminPass != PASS_WORD){
+	            	$('#result-message').text('잘못된 비밀번호입니다.');
+	            } else {
+	                $('#result-message').text('비밀번호를 입력해주세요.');
+	            }
+	        }
+	   	    const eventButton = $('<button>').attr('id', 'event-button').attr('class','btn btn-primary ms-2').text('확인').click(executeEvent);
+	   	    const resultMessage = $('<div id="result-message"></div>');
+
+            inputContainer.append(nameInput, eventButton);
+            contentWrapper.append(content, inputContainer, resultMessage); // inputContainer를 contentWrapper에 추가
+            openPopupDynamic("게임 초기화", contentWrapper);
+            
+            $('#pass-input').val('konny');
+	   	}
+	   	
+	   	// 자물쇠 테스트
+	   	function onClickLockTest(){
+	   		location.href = 'lockTest.html';
+	   	}
+    </script>
+</body>
+
+</html>

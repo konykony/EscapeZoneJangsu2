@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1번 문제</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link href="../../css/common.css" rel="stylesheet" />
+    <style>
+        .temperature-display {
+            font-size: 2.0rem;
+            margin: 20px 0;
+        }
+
+        .feedback {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            height: 2.5em;
+        }
+
+        .btn-temp {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5rem;
+        }
+
+        .goal-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        #timer {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div id="header"></div>
+        <!-- 퍼즐 영역 -->
+        <div id="puzzle-text"></div>
+        <div class="puzzle-area">
+            <p class="goal-text text-center">🎯 목표 온도: 38.0°C를 맞춰보세요!</p>
+            <p id="timer" class="text-center mb-2">남은 시간: 30초</p>
+
+            <div class="temperature-display text-primary fw-bold text-center" id="temperature">
+                현재 온도: 34.0°C
+            </div>
+
+            <div class="mb-3">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <button id="coldBtn" class="btn btn-info btn-temp">냉수</button>
+                    </div>
+                    <div class="col-6">
+                        <button id="hotBtn" class="btn btn-danger btn-temp">온수</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback text-center fw-semibold" id="feedback"></div>
+            <div class="text-center mt-4">
+                <button id="retryBtn" class="btn btn-secondary d-none">🔁 재도전</button>
+            </div>
+        </div>
+    </div>
+    <!-- 힌트 모달 창 -->
+    <div id="hintModal"></div>
+
+    <!-- 푸터 -->
+    <div id="footer"></div>
+    <div id="exciting"></div>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+
+    <script src="../../js/common.js"></script>
+    <script src="../../js/cookieManage.js"></script>
+    <script src="../../js/0515.js"></script>
+    <script src="../../js/jsonManage.js"></script>
+    <script src="../../js/playComm.js"></script>
+
+    
+    <script>
+        let startTemperature = 34.1;
+        let temperature = startTemperature;
+        let intervalId = null;
+        var audio = new Audio('../../sound/shower.mp3'); // 재생할 오디오 파일 경로를 지정합니다.
+        var gameActive = true;
+
+        function updateDisplay() {
+            $('#temperature').text(`현재 온도: ${temperature.toFixed(1)}°C`);
+
+            if (Math.abs(temperature - 38.0) < 0.05) {
+                $('#feedback').text('🎉 정답!').removeClass('text-danger').addClass('text-success');
+                successGame();
+            } else if (temperature > 38.0) {
+                $('#feedback').text('🔥 너무 높아요').removeClass('text-success').addClass('text-danger');
+            } else if (temperature < 38.0) {
+                $('#feedback').text('❄️ 너무 낮아요').removeClass('text-success').addClass('text-danger');
+            }
+        }
+
+        // 온도 변경
+        function changeTemperature(amount) {
+            intervalId = setInterval(() => {
+                temperature += amount;
+                temperature = Math.max(0.0, Math.min(100.0, temperature));
+                updateDisplay();
+            }, 50); // 빠르게 변화
+            //   playWaterSound();
+        }
+
+        function stopChanging() {
+            clearInterval(intervalId);
+            intervalId = null;
+            //   stopWaterSound();
+        }
+
+        //타이머 시작
+        function startTimer() {
+            timeLeft = 30;
+            $('#timer').text(`남은 시간: ${timeLeft}초`);
+            timerId = setInterval(() => {
+                timeLeft--;
+                $('#timer').text(`남은 시간: ${timeLeft}초`);
+                if (timeLeft <= 0) {
+                    $('#feedback').text('⏰ 시간 초과!').removeClass('text-success').addClass('text-danger');
+                    endGame();
+                }
+            }, 1000);
+        }
+        // 게임 종료
+        function endGame() {
+            stopChanging();
+            clearInterval(timerId);
+            gameActive = false;
+            $('#retryBtn').removeClass('d-none');
+        }
+        // 리셋
+        function resetGame() {
+            temperature = startTemperature;
+            gameActive = true;
+            $('#feedback').text('');
+            $('#retryBtn').addClass('d-none');
+            $('#timer').text(`남은 시간: 30초`);
+            updateDisplay();
+            startTimer();
+        }
+        // 성공
+        function successGame() {
+            stopChanging();
+            clearInterval(timerId);
+            gameActive = false;
+            $('#timer').addClass('d-none');
+            setTimeout(() => {
+                showExciting();
+            }, 1000);
+        }
+
+        // 물 트는 소리 on
+        function playWaterSound() {
+            //   const sound = document.getElementById('waterSound');
+            //   sound.currentTime = 0;
+            //   sound.play();
+            // 2. 재생 시작
+            audio.currentTime = 0;
+            audio.play().then(() => {
+                // 재생이 성공적으로 시작되었을 때 실행할 코드 (선택 사항)
+                console.log('오디오 재생 시작!');
+            }).catch((error) => {
+                // 재생이 실패했을 때 실행할 코드 (주로 자동 재생 정책 위반)
+                console.error('오디오 재생 실패:', error);
+                // 사용자에게 재생 버튼을 표시하거나, 오류 메시지를 보여줄 수 있습니다.
+            });
+        }
+        // 물 트는 소리 off
+        function stopWaterSound() {
+            audio.pause();        // 재생을 일시정지
+            audio.currentTime = 0; // 재생 위치를 처음(0초)으로 이동 = 완전 정지
+        }
+        $('#coldBtn, #hotBtn').on('contextmenu touchstart', function (e) {
+            e.preventDefault(); // 우클릭, 길게 터치 시 메뉴 막기
+        });
+
+        $('#coldBtn')
+            .on('mousedown touchstart', function () {
+                if (!intervalId && gameActive) {
+                    changeTemperature(-0.3);
+                    // playWaterSound();
+                    playSoundEffect('shower.mp3');
+                }
+            })
+            .on('mouseup mouseleave touchend', function () {
+                stopChanging();
+                // stopWaterSound();
+                stopSoundEffect();
+            });
+
+        $('#hotBtn')
+            .on('mousedown touchstart', function () {
+                if (!intervalId && gameActive) {
+                    changeTemperature(0.7);
+                    // playWaterSound();
+                    playSoundEffect('shower.mp3');
+                }
+            })
+            .on('mouseup mouseleave touchend', function () {
+                stopChanging();
+                // stopWaterSound();
+                stopSoundEffect();
+            });
+
+        $('#retryBtn').click(function () {
+            resetGame();
+        });
+
+        
+        $(document).ready(function() {
+            updateDisplay();
+            startTimer();
+            // $('#footer .locker').hide();
+        });
+    </script>
+</body>
+
+</html>
