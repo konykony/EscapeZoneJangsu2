@@ -233,8 +233,10 @@ div.progress {
 	text-decoration: none;
 }
 
-img {
+#lockModal img {
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
+
