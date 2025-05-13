@@ -233,10 +233,17 @@ div.progress {
 	text-decoration: none;
 }
 
-#lockModal img {
+#lockModal div {
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-  }
+}
+
+  #lockModal button {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
 
