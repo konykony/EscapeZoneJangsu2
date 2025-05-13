@@ -6,15 +6,34 @@ $(document).ready(function() {
 	$('#lockModal button').on('click', function(e) {
 		e.preventDefault(); // 더블탭 확대 영향 감소
 		// 버튼 기능 수행
-	  });
+	});
+
+	history.pushState(null, null, '/index.html');
+
+	// $(window).on('popstate', function () {
+	// 	debugger;
+	// 	if (confirm("홈으로 돌아가시겠습니까?")) {
+	// 		location.href = "/index.html";
+	// 	} else {
+	// 		history.pushState(null, null, '/index.html');
+	// 	}
+	// });
 });
 
-$(window).on('popstate', function (e) {
-	// 뒤로 가기 감지
-	console.log('사용자가 브라우저 뒤로 가기 버튼을 눌렀습니다.');
-	// location.href = '/pages/play/start.html';
-	// history.pushState(null, null, '/pages/play/start.html');     // ✔ OK
-	history.pushState(null, null, location.href);
+// $(window).on('popstate', function (e) {
+// 	// 뒤로 가기 감지
+// 	console.log('사용자가 브라우저 뒤로 가기 버튼을 눌렀습니다.');
+// 	// location.href = '/pages/play/start.html';
+// 	// history.pushState(null, null, '/pages/play/start.html');     // ✔ OK
+// 	history.pushState(null, null, location.href);
+// });
+
+$(window).on('popstate', function () {
+	if (confirm("홈으로 돌아가시겠습니까?")) {
+	  	location.href = "/index.html";
+	} else {
+		history.pushState(null, null, '/index.html');
+	}
 });
 
 // 팝업 추가 창 초기화
