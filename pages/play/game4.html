@@ -98,6 +98,11 @@
             color: #dc3545;
         }
 
+        #status-bar {
+            margin-left: 0.25em;
+        }
+
+
         #status-bar span {
             font-size: 1em;
         }
@@ -138,11 +143,11 @@
         <!-- 퍼즐 영역 -->
         <div id="puzzle-text"></div>
         <div class="puzzle-area">
-            <div id="status-bar">
-                점수: <span id="score">0</span> / 난이도: <span id="difficulty">1</span>
-            </div>
+            
 
-            <div id="game-area"></div>
+            <div id="game-area">
+                <div id="status-bar"> 점수: <span id="score">0</span> / 난이도: <span id="difficulty">1</span></div>
+            </div>
         </div>
     </div>
     <!-- 힌트 모달 창 -->
