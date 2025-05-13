@@ -8,7 +8,7 @@ $(document).ready(function() {
 		// 버튼 기능 수행
 	});
 
-	history.pushState(null, null, '/index.html');
+	setHistoryPush();
 
 	// $(window).on('popstate', function () {
 	// 	debugger;
@@ -20,6 +20,14 @@ $(document).ready(function() {
 	// });
 });
 
+function setHistoryPush(){
+	if(window.location.hostname == '127.0.0.1'){
+		history.pushState(null, null, '/index.html');
+	} else{
+		history.pushState(null, null, '/EscapeZoneJangsu2/index.html');
+	}
+}
+
 // $(window).on('popstate', function (e) {
 // 	// 뒤로 가기 감지
 // 	console.log('사용자가 브라우저 뒤로 가기 버튼을 눌렀습니다.');
@@ -29,11 +37,7 @@ $(document).ready(function() {
 // });
 
 $(window).on('popstate', function () {
-	if (confirm("홈으로 돌아가시겠습니까?")) {
-	  	location.href = "/index.html";
-	} else {
-		history.pushState(null, null, '/index.html');
-	}
+	setHistoryPush();
 });
 
 // 팝업 추가 창 초기화
