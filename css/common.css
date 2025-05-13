@@ -240,7 +240,7 @@ div.progress {
     -webkit-tap-highlight-color: transparent;
 }
 
-  #lockModal button {
+#lockModal button {
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;

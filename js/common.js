@@ -3,7 +3,10 @@
  */
 $(document).ready(function() {
 	initPopupOverlay(); // 팝업 추가 창 초기화
-    $('#lockModal img').attr('draggable', 'false');
+	$('#lockModal button').on('click', function(e) {
+		e.preventDefault(); // 더블탭 확대 영향 감소
+		// 버튼 기능 수행
+	  });
 });
 
 // 팝업 추가 창 초기화
