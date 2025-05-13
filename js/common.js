@@ -9,6 +9,12 @@ $(document).ready(function() {
 	  });
 });
 
+$(window).on('popstate', function (e) {
+	// 뒤로 가기 감지
+	console.log('사용자가 브라우저 뒤로 가기 버튼을 눌렀습니다.');
+	location.href = '/pages/play/start.html';
+});
+
 // 팝업 추가 창 초기화
 function initPopupOverlay(){
     if ($('#popup-overlay').length) {
