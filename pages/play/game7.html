@@ -38,7 +38,7 @@
             user-select: none;
             position: relative;
             z-index: 10;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
         }
 
         .square {
@@ -122,7 +122,7 @@
             font-weight: bold;
             color: #333;
             transition: filter .1s;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
         }
 
         #progress-container {
@@ -161,7 +161,7 @@
             display: none;
         }
         .puzzle-area{
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             /* overflow-y: auto;
             max-height: 100%; */
         }
@@ -466,7 +466,11 @@
                     .toggleClass('text-success', ok);
                     $('#btnNext').show();
                     $('#stack-area').sortable('disable');
-                    playAudio('success.mp3');
+                    // playAudio('success.mp3');
+                    
+                    setTimeout(() => {
+                        showExciting();
+                    }, 1000);
                     // setTimeout(() => {
                     //     showExciting();
                     // }, 1000);

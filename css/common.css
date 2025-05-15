@@ -11,9 +11,10 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 0;
-    overflow: hidden;
+    padding: 0 0 70px 0;
+    overflow: auto;  /* ✅ 스크롤 가능 */
     height: 100vh;
+    /* margin-bottom: 70px; */
 }
 
 #header {
@@ -80,6 +81,7 @@ div.progress {
     justify-content: space-evenly;
     align-items: center;
     z-index: 10;
+    display: flex;
 }
 
 #footer .btn {
