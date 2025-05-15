@@ -170,7 +170,11 @@ function setPuzzleImg() {
 			setLockBtn(e);
 			// setPuzzleTextHide(e);
 		});
+
+		// setPuzzleTextDrag();
 	}
+
+
 	//	$('#hiddenPlace').text(getHiddenPlace());
 }
 
@@ -215,6 +219,40 @@ function setHintBtn(e){
 		$("#hintModal").show();
 	}
 }
+
+// let startX = 0;
+// let startY = 0;
+// let isDragging = false;
+// // 퍼즐 텍스트 드래그 세팅
+// function setPuzzleTextDrag(){
+// 	$('#puzzle-text').on('mousedown', function(e) {
+// 		startX = e.pageX;
+// 		startY = e.pageY;
+// 		isDragging = false;
+	  
+// 		$(document).on('mousemove.dragcheck', function(e) {
+// 		  const dx = Math.abs(e.pageX - startX);
+// 		  const dy = Math.abs(e.pageY - startY);
+	  
+// 		  if (dx > 5 || dy > 5) {
+// 			isDragging = true;
+// 			console.log('드래그 중!');
+// 		  }
+// 		});
+	  
+// 		$(document).on('mouseup.dragcheck', function(e) {
+// 		  if (isDragging) {
+// 			console.log('드래그 종료!');
+// 		  } else {
+// 			console.log('그냥 클릭!');
+// 		  }
+	  
+// 		  // 이벤트 해제 및 초기화
+// 		  $(document).off('.dragcheck');
+// 		  isDragging = false;
+// 		});
+// 	  });
+// }
 
 // 시계 화면 업데이트
 function updateDisplayTime() {
