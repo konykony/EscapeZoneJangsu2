@@ -142,11 +142,25 @@
         <div id="header"></div>
         <!-- 퍼즐 영역 -->
         <div id="puzzle-text"></div>
-        <div class="puzzle-area">
-            
 
-            <div id="game-area">
-                <div id="status-bar"> 점수: <span id="score">0</span> / 난이도: <span id="difficulty">1</span></div>
+        <div class="puzzle-area">
+            <!-- 토글글 버튼 그룹 -->
+            <div class="btn-group btn-group-sm" role="group" id="difficulty-toggle">
+                <input type="radio" class="btn-check" name="difficulty" id="easy" value="50" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="easy">쉬움</label>
+
+                <input type="radio" class="btn-check" name="difficulty" id="normal" value="150" autocomplete="off">
+                <label class="btn btn-outline-primary" for="normal">보통</label>
+
+                <input type="radio" class="btn-check" name="difficulty" id="hard" value="300" autocomplete="off">
+                <label class="btn btn-outline-primary" for="hard">어려움</label>
+
+                <input type="radio" class="btn-check" name="difficulty" id="very-hard" value="500" autocomplete="off">
+                <label class="btn btn-outline-primary" for="very-hard">매우 어려움</label>
+            </div>
+            <div id="game-area" class="mt-1">
+                <div id="status-bar"> 점수: <span id="score">0</span> / 단계: <span id="difficulty">1</span></div>
+                
             </div>
         </div>
     </div>
@@ -178,14 +192,21 @@
 
         const maxLevel = 10;
         // finalScore = 50;
-        let finalScore = 200;
+        let finalScore = 50;
         let lastItemName = '';
         let bathStreak = 0;
 
         $(function () {
-            if (checkTestMode()) {
-                finalScore = 50;
-            }
+            // if (checkTestMode()) {
+            //     finalScore = 50;
+            // }
+
+            
+            $('input[name="difficulty"]').on('change', function() {
+                finalScore = $(this).val();
+                // $('#selected-value').text(selectedValue);
+            });
+
             const $area = $('#game-area');
             let score = 0,
                 level = 1,
@@ -385,6 +406,9 @@
                 startCollisionCheck();
 
                 playAudio('coin05.mp3');
+
+                // 난이도 선택 버튼 비활성화
+                $('input[name="difficulty"]').prop('disabled', true);
             }
 
             // 게임 종료
@@ -400,6 +424,9 @@
                 } else {
                     showRestart(msg + `<br/> 최종점수: ${score}`);
                 }
+                
+                // 난이도 선택 버튼 활성화
+                $('input[name="difficulty"]').prop('disabled', false);
             }
 
             // 최초 “시작” 버튼
