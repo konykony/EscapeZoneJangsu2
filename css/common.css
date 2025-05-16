@@ -23,6 +23,7 @@ body {
     margin-top: 35px;
     flex-shrink: 0; /* flexbox 레이아웃에서 줄어들지 않게 */
     display: block;
+    position: relative;
 }
 
 #header {
