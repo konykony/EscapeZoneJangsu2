@@ -700,6 +700,11 @@ function initFooter() {
         <button class="btn btn-outline-primary locker">자물쇠</button>`;
 
 	$("#footer").append(footerHtml);
+	
+	const spacer = $('<div class="footer-spacer"></div>');
+
+    // .main-content 뒤에 spacer 추가
+    $("#game-container").append(spacer);
 	initFooterEvents();
 }
 

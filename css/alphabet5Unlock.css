@@ -60,10 +60,9 @@
   }
   
   /* 3. 호버 시 커서 변경 */
-  .mirror-container:hover {
-    /* 손바닥 커서 */
+  /* .mirror-container:hover {
     cursor: url('palm.cur'), auto;
-  }
+  } */
   
   /* 만약 특정 상태마다 다른 커서를 쓰고 싶다면 클래스 토글 */
   /* .mirror-container.hand-cursor:hover {

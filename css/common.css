@@ -10,11 +10,17 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    padding: 0 0 70px 0;
+    /* padding: 0 0 70px 0; */
+    padding: 0;
     overflow: auto;  /* ✅ 스크롤 가능 */
     height: 100vh;
     /* margin-bottom: 70px; */
+}
+
+.footer-spacer{
+    height: 70px; /* footer 높이만큼 조절 */
+    flex-shrink: 0; /* flexbox 레이아웃에서 줄어들지 않게 */
+    display: block;
 }
 
 #header {
