@@ -159,7 +159,7 @@
                 <label class="btn btn-outline-primary" for="very-hard">매우 어려움</label>
             </div>
             <div id="game-area" class="mt-1">
-                <div id="status-bar"> 점수: <span id="score">0</span> / 단계: <span id="difficulty">1</span></div>
+                <div id="status-bar">목표점수: <span id="goal-score">50</span> / 점수: <span id="score">0</span> / 단계: <span id="difficulty">1</span></div>
                 
             </div>
         </div>
@@ -204,7 +204,7 @@
             
             $('input[name="difficulty"]').on('change', function() {
                 finalScore = $(this).val();
-                // $('#selected-value').text(selectedValue);
+                $('#goal-score').text(finalScore);
             });
 
             const $area = $('#game-area');
